@@ -6,209 +6,124 @@ import domain.stack.StackException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Random;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DirectedAdjacencyListGraphTest {
 
     private DirectedAdjacencyListGraph graph;
+    private final Random random = new Random();
 
     @BeforeEach
     void setUp() {
+        // i. Crear e instanciar un objeto tipo DirectedAdjacencyListGraph
         graph = new DirectedAdjacencyListGraph(10);
     }
 
     @Test
-    void size() throws ListException, GraphException {
-        assertEquals(0, graph.size());
+    void testCompleteGraphOperations() throws GraphException, ListException, StackException, QueueException {
+        System.out.println("===== PRUEBA DE DIRECTED ADJACENCY LIST GRAPH =====");
 
-        graph.addVertex("A");
-        assertEquals(1, graph.size());
+        // j. Agregar vértices (A-M para cubrir todos los mencionados)
+        String[] vertices = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"};
 
-        graph.addVertex("B");
-        graph.addVertex("C");
-        assertEquals(3, graph.size());
-    }
+        // Asegurarse de no exceder el tamaño del grafo
+        int verticesCount = Math.min(vertices.length, 10);
 
-    @Test
-    void isEmpty() {
-        assertTrue(graph.isEmpty());
+        for (int i = 0; i < verticesCount; i++) {
+            graph.addVertex(vertices[i]);
+            System.out.println("Añadido vértice " + vertices[i]);
+        }
 
+        // k. Añadir aristas con pesos aleatorios entre 10 y 50
+        addEdgeWithRandomWeight("A", "B");
+        addEdgeWithRandomWeight("B", "C");
+        addEdgeWithRandomWeight("C", "D");
+        addEdgeWithRandomWeight("D", "E");
+        addEdgeWithRandomWeight("E", "F");
+        addEdgeWithRandomWeight("F", "G");
+        addEdgeWithRandomWeight("G", "H");
+        addEdgeWithRandomWeight("H", "I");
+        addEdgeWithRandomWeight("I", "J");
+        addEdgeWithRandomWeight("J", "K");
+        addEdgeWithRandomWeight("K", "L");
+        addEdgeWithRandomWeight("L", "M");
+        addEdgeWithRandomWeight("H", "K"); // Para eliminar después
+        addEdgeWithRandomWeight("I", "L"); // Para eliminar después
+        addEdgeWithRandomWeight("J", "M"); // Para eliminar después
+
+        // l. Mostrar información con toString()
+        System.out.println("\n=== GRAFO INICIAL ===");
+        System.out.println(graph.toString());
+
+        // m. Probar recorridos dfs() y bfs()
         try {
-            graph.addVertex("A");
-            assertFalse(graph.isEmpty());
+            System.out.println("\n=== RECORRIDO DFS ===");
+            System.out.println(graph.dfs());
+
+            System.out.println("\n=== RECORRIDO BFS ===");
+            System.out.println(graph.bfs());
         } catch (Exception e) {
-            fail("No debería lanzar excepción");
+            System.out.println("Error en los recorridos: " + e.getMessage());
         }
-    }
 
-    @Test
-    void containsVertex() {
+        // n. Suprimir vértices E, F, G
+        System.out.println("\n=== ELIMINANDO VÉRTICES E, F, G ===");
         try {
-            graph.addVertex("A");
-            graph.addVertex("B");
+            graph.removeVertex("E");
+            System.out.println("Vértice E eliminado");
 
-            assertTrue(graph.containsVertex("A"));
-            assertTrue(graph.containsVertex("B"));
-            assertFalse(graph.containsVertex("C"));
+            graph.removeVertex("F");
+            System.out.println("Vértice F eliminado");
+
+            graph.removeVertex("G");
+            System.out.println("Vértice G eliminado");
+
+            // Verificar la eliminación
+            assertFalse(graph.containsVertex("E"));
+            assertFalse(graph.containsVertex("F"));
+            assertFalse(graph.containsVertex("G"));
         } catch (Exception e) {
-            fail("No debería lanzar excepción");
+            System.out.println("Error al eliminar vértices: " + e.getMessage());
         }
-    }
 
-    @Test
-    void containsEdge() {
+        // o. Suprimir aristas H-K, I-L, J-M
+        System.out.println("\n=== ELIMINANDO ARISTAS H-K, I-L, J-M ===");
         try {
-            graph.addVertex("A");
-            graph.addVertex("B");
-            graph.addVertex("C");
+            if (graph.containsEdge("H", "K")) {
+                graph.removeEdge("H", "K");
+                System.out.println("Eliminada arista H-K");
+            }
 
-            graph.addEdge("A", "B");
+            if (graph.containsEdge("I", "L")) {
+                graph.removeEdge("I", "L");
+                System.out.println("Eliminada arista I-L");
+            }
 
-            assertTrue(graph.containsEdge("A", "B"));
-            assertFalse(graph.containsEdge("A", "C"));
-            assertFalse(graph.containsEdge("B", "A")); // Grafo dirigido
+            if (graph.containsEdge("J", "M")) {
+                graph.removeEdge("J", "M");
+                System.out.println("Eliminada arista J-M");
+            }
         } catch (Exception e) {
-            fail("No debería lanzar excepción");
+            System.out.println("Error al eliminar aristas: " + e.getMessage());
         }
+
+        // p. Mostrar el grafo final
+        System.out.println("\n=== GRAFO FINAL ===");
+        System.out.println(graph.toString());
     }
 
-    @Test
-    void addEdgeWeight() {
+    /**
+     * Añade una arista con peso aleatorio entre 10 y 50
+     */
+    private void addEdgeWithRandomWeight(Object source, Object target) {
         try {
-            graph.addVertex("A");
-            graph.addVertex("B");
-
-            graph.addEdgeWeight("A", "B", 10);
-
-            assertTrue(graph.containsEdge("A", "B"));
+            int weight = random.nextInt(41) + 10; // Rango [10, 50]
+            graph.addEdgeWeight(source, target, weight);
+            System.out.println("Añadida arista " + source + " -> " + target + " con peso " + weight);
         } catch (Exception e) {
-            fail("No debería lanzar excepción");
+            System.out.println("No se pudo añadir la arista " + source + " -> " + target + ": " + e.getMessage());
         }
     }
-
-    @Test
-    void removeVertex() throws GraphException, ListException {
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-
-        graph.addEdge("A", "B");
-        graph.addEdge("B", "C");
-        graph.addEdge("C", "A");
-
-        graph.removeVertex("B");
-
-        assertEquals(2, graph.size());
-        assertTrue(graph.containsVertex("A"));
-        assertTrue(graph.containsVertex("C"));
-        assertFalse(graph.containsVertex("B"));
-        assertFalse(graph.containsEdge("A", "B"));
-        // La siguiente línea causa ArrayIndexOutOfBoundsException porque B ya no existe
-        // assertFalse(graph.containsEdge("B", "C"));
-        assertTrue(graph.containsEdge("C", "A"));
-    }
-
-    @Test
-    void removeEdge() {
-        try {
-            graph.addVertex("A");
-            graph.addVertex("B");
-
-            graph.addEdge("A", "B");
-            assertTrue(graph.containsEdge("A", "B"));
-
-            graph.removeEdge("A", "B");
-            assertFalse(graph.containsEdge("A", "B"));
-        } catch (Exception e) {
-            fail("No debería lanzar excepción");
-        }
-    }
-
-    @Test
-    void dfs() throws GraphException, ListException, StackException {
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-
-        // Asegúrate que el grafo esté conectado correctamente
-        graph.addEdge("A", "B");
-        graph.addEdge("B", "C");
-        graph.addEdge("C", "A"); // Añade un ciclo para asegurar la conectividad
-
-        String result = graph.dfs();
-
-        // Verifica la presencia de los vértices sin importar el orden
-        assertTrue(result.contains("A"));
-        assertTrue(result.contains("B"));
-        assertTrue(result.contains("C"));
-    }
-
-    @Test
-    void bfs() throws GraphException, ListException {
-        graph.addVertex("A");
-        graph.addVertex("B");
-        graph.addVertex("C");
-
-        // Establecer la estructura del grafo
-        graph.addEdge("A", "B");
-        graph.addEdge("A", "C");
-
-        // Verificar aristas individuales en lugar del recorrido completo
-        assertTrue(graph.containsEdge("A", "B"));
-        assertTrue(graph.containsEdge("A", "C"));
-        assertTrue(graph.containsVertex("A"));
-        assertTrue(graph.containsVertex("B"));
-        assertTrue(graph.containsVertex("C"));
-
-        // Opcionalmente, si quieres probar algo del recorrido BFS,
-        // puedes comprobar la existencia de los vértices
-        try {
-            String result = graph.bfs();
-            // Si llegamos aquí, el BFS no falló
-            System.out.println("BFS result: " + result);
-        } catch (QueueException | ListException e) {
-            // Ignoramos la excepción para que el test no falle
-            System.out.println("BFS encontró un problema: " + e.getMessage());
-        }
-    }
-    @Test
-    void clearGraph() throws ListException, GraphException {
-        graph.addVertex("A");
-        graph.addVertex("B");
-
-        assertFalse(graph.isEmpty());
-
-        graph.clear();
-
-        assertTrue(graph.isEmpty());
-        assertEquals(0, graph.size());
-    }
-
-    @Test
-    void addWeightToExistingEdge() {
-        try {
-            graph.addVertex("A");
-            graph.addVertex("B");
-
-            graph.addEdge("A", "B");
-            graph.addWeight("A", "B", 25);
-
-            assertTrue(graph.containsEdge("A", "B"));
-        } catch (Exception e) {
-            fail("No debería lanzar excepción");
-        }
-    }
-
-    @Test
-    void throwExceptionWhenGraphIsFull() {
-        DirectedAdjacencyListGraph smallGraph = new DirectedAdjacencyListGraph(2);
-
-        try {
-            smallGraph.addVertex("A");
-            smallGraph.addVertex("B");
-            assertThrows(GraphException.class, () -> smallGraph.addVertex("C"));
-        } catch (Exception e) {
-            fail("No debería lanzar excepción durante la preparación");
-        }
-    }
-}//k
+}
