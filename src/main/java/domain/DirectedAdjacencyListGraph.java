@@ -5,7 +5,7 @@ import domain.queue.LinkedQueue;
 import domain.queue.QueueException;
 import domain.stack.LinkedStack;
 import domain.stack.StackException;
-
+//LOS IMPORTS DEBEN ESTAR EN EL MISMO PAQUETE QUE LA CLASE
 public class DirectedAdjacencyListGraph implements Graph {
     private Vertex[] vertexList; //arreglo de objetos tupo vértice
     private int n; //max de elementos
