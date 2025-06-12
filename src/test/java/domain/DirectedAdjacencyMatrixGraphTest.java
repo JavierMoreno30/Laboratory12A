@@ -105,7 +105,7 @@ class DirectedAdjacencyMatrixGraphTest {
             }
         }
     }
-
+//k
     @Test
     void size() throws ListException {
         assertEquals(0, graph.size());
